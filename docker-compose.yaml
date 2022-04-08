@@ -1,0 +1,37 @@
+services:
+  php:
+    build: './php/'
+    volumes:
+      - ${SRC_DIR}:/var/www/html/
+    networks: 
+      - backend
+  apache:
+    build: './apache/'
+    depends_on:
+      - php
+      - pgsql
+    ports:
+      - "80:80"
+    networks: 
+      - frontend
+      - backend
+    volumes:
+      - ${SRC_DIR}:/var/www/html/
+    environment: 
+      - POSTGRES_USER=${PG_USER}
+        POSTGRES_PASSOWRD=${PG_PASS}
+  pgsql:
+    image: postgres
+    restart: always
+    container_name: pgsql
+    networks: 
+      - backend
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
+      - POSTGRES_USER=${PG_USER}
+      - POSTGRES_PASSOWRD=${PG_PASS}
+    volumes: 
+      - ${DB_DATA}:/var/lib/postgresql/data/
+networks: 
+  frontend:
+  backend:
